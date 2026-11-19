@@ -9,7 +9,7 @@
 "use strict";
 
 const FRAME = 1 / 30;
-const SEEK_DRIFT = 0.25;        // s; beyond this the slave seeks instead of catching up
+const SEEK_DRIFT = 0.1;         // s; beyond this the slave seeks instead of catching up
 const MAX_NUDGE = 0.15;         // the slave runs at most 15 % faster or slower than the master
 const GAIN = 6;                 // rate change per second of drift: 20 ms behind -> 12 % faster
 
@@ -103,7 +103,8 @@ class SyncPlayer {
     }
     this.s.load();
     this.s.addEventListener("loadedmetadata", () => {
-      this.s.currentTime = t;
+      // the master kept playing while the new clip loaded: join it where it is now
+      this.s.currentTime = this.playing ? this.m.currentTime : t;
       this.s.playbackRate = this.rate;
       if (this.playing) this.s.play().catch(() => {});
     }, { once: true });
