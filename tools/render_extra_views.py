@@ -25,7 +25,7 @@ Per video it writes <out>/<Video N>/:
     lidar_contact.npz         sweeps within +/-1.5 s of contact (xyz float16, tag uint8)
     recording.log             CARLA recorder log of the whole run
     near_real.mp4, top_view.mp4, render.json, telemetry.csv   the renderer's own output
-    extra_views.json          sensor setup and which vehicle is 1 and 2
+    extra_views.json          sensor setup, which vehicle is 1 and 2, their bounding boxes
 """
 from __future__ import annotations
 
@@ -85,13 +85,17 @@ class Mount:
     lidar_z: float
     half_len: float
     half_wid: float
+    box_centre: tuple[float, float, float]     # bounding box in the vehicle frame
+    box_extent: tuple[float, float, float]
 
 
 def mount_for(actor) -> Mount:
     bb = actor.bounding_box
     top = bb.location.z + bb.extent.z
     return Mount(ego_x=bb.location.x + 0.4 * bb.extent.x, ego_z=top + 0.25,
-                 lidar_z=top + 0.4, half_len=bb.extent.x, half_wid=bb.extent.y)
+                 lidar_z=top + 0.4, half_len=bb.extent.x, half_wid=bb.extent.y,
+                 box_centre=(bb.location.x, bb.location.y, bb.location.z),
+                 box_extent=(bb.extent.x, bb.extent.y, bb.extent.z))
 
 
 def _chase_basis():
@@ -302,7 +306,9 @@ def render_one(client, world, video: str, out_root: Path, R) -> dict:
         R.Encoder, R.teardown = base_encoder, base_teardown
         extras.destroy()
     meta = {"video": video, "frames": extras.written, "collision_at_frame": info["collision_at_frame"],
-            "vehicles": {str(i): {"track_id": t, "class": info["actors"][str(t)]["class"]}
+            "vehicles": {str(i): {"track_id": t, "class": info["actors"][str(t)]["class"],
+                                  "box": {"centre_m": [round(c, 4) for c in extras.mounts[i].box_centre],
+                                          "half_extent_m": [round(c, 4) for c in extras.mounts[i].box_extent]}}
                          for i, t in enumerate(tids, start=1)},
             "ego_camera": {"size": [EGO_W, EGO_H], "fov_deg": EGO_FOV, "pitch_deg": -5.0,
                            "mount": "front of the roof, from the bounding box"},
