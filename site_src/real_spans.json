@@ -1,0 +1,74 @@
+{
+  "Video 103": {
+    "contact_s_in_source": 3.1,
+    "real_from_s": -3.1,
+    "real_to_s": 3.0,
+    "source_fps": 30.0
+  },
+  "Video 108": {
+    "contact_s_in_source": 7.28,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 25.0
+  },
+  "Video 114": {
+    "contact_s_in_source": 8.88,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 25.0
+  },
+  "Video 124": {
+    "contact_s_in_source": 8.1,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 30.0
+  },
+  "Video 127": {
+    "contact_s_in_source": 6.8,
+    "real_from_s": -4.0,
+    "real_to_s": 0.4,
+    "source_fps": 30.0
+  },
+  "Video 144": {
+    "contact_s_in_source": 6.613,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 29.943
+  },
+  "Video 152": {
+    "contact_s_in_source": 1.6,
+    "real_from_s": -1.6,
+    "real_to_s": 2.2,
+    "source_fps": 30.0
+  },
+  "Video 155": {
+    "contact_s_in_source": 2.549,
+    "real_from_s": -2.549,
+    "real_to_s": 3.0,
+    "source_fps": 24.319
+  },
+  "Video 160": {
+    "contact_s_in_source": 3.604,
+    "real_from_s": -3.604,
+    "real_to_s": 3.0,
+    "source_fps": 29.97
+  },
+  "Video 30": {
+    "contact_s_in_source": 3.103,
+    "real_from_s": -3.103,
+    "real_to_s": 3.0,
+    "source_fps": 29.97
+  },
+  "Video 41": {
+    "contact_s_in_source": 5.706,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 29.97
+  },
+  "Video 58": {
+    "contact_s_in_source": 89.5,
+    "real_from_s": -4.0,
+    "real_to_s": 3.0,
+    "source_fps": 6.0
+  }
+}

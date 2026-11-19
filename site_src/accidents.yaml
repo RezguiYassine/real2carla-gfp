@@ -1,0 +1,75 @@
+# The accidents the page shows. One entry per accident; `python tools/build_site.py`
+# checks every entry against the Sim2sim scenario and render files.
+#
+# collision: the scenario's collision.type (checked at build time)
+# window_s:  clip around first contact, t = 0
+# role:      gallery (rated good in iteration 6) or failure (still needs work)
+
+gallery:
+  - video: Video 108
+    title: A bus turns across a car's path
+    collision: front_to_side
+    download: true
+  - video: Video 114
+    title: Two cars meet at a junction
+    collision: front_to_side
+    download: true
+  - video: Video 127
+    title: A car turns into a motorcycle
+    collision: front_to_side
+    download: true
+  - video: Video 30
+    title: Head-on collision of two cars
+    collision: front_to_front
+    download: true
+  - video: Video 103
+    title: A van and a motorcycle collide head-on
+    collision: front_to_front
+    download: true
+  - video: Video 124
+    title: A car sideswipes a motorcycle
+    collision: side_to_side
+    download: true
+  - video: Video 58
+    title: A truck sideswipes a car
+    collision: side_to_side
+    download: true
+  - video: Video 160
+    title: Rear-end collision in traffic
+    collision: front_to_rear
+    download: true
+  - video: Video 152
+    title: Rear-end collision on a narrow street
+    collision: front_to_rear
+    download: true
+
+failures:
+  - video: Video 144
+    title: A car, a pedestrian, and a car the tracker missed
+    collision: other
+    # the second road user is a pedestrian: no vehicle-mounted sensors
+    views: [near_real, top_view, ego1, lidar1]
+    reason: >-
+      The tracker missed the car that arrives from the left, strikes car 20837
+      and is pushed towards the pedestrian. Without it no car-to-car contact
+      can be planned, so only the near miss with the pedestrian is rendered.
+  - video: Video 41
+    title: Head-on collision seen from the wrong side
+    collision: front_to_front
+    reason: >-
+      In the real video one car arrives from the front and the other from
+      behind. The reconstruction places both arrivals one sector off in the
+      same rotational direction, so they come from the right and the left,
+      and the timing of the swerve does not match.
+  - video: Video 155
+    title: Junction collision with the roles reversed
+    collision: front_to_side
+    reason: >-
+      At the annotated contact time, car 4062's track is still 10 m short of
+      the other car's path. The collision solver reaches only a corner touch,
+      with the striking and struck vehicles swapped.
+
+history:
+  video: Video 160
+  # Iteration 4 was rendered but rated for one video only; it has no status.
+  iterations: [1, 2, 3, 4, 5, 6]

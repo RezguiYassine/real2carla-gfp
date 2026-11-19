@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+{# Generated into index.html by tools/build_site.py; edit this file, not index.html. #}
+{% macro player(card, kind) %}
+{% set a = card.acc %}
+<div class="player" data-window="{{ a.window_s[0] }},{{ a.window_s[1] }}"
+     data-real="{{ card.real_span.real_from_s }},{{ card.real_span.real_to_s }}">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/{{ a.slug }}/real.jpg"
+             src="static/videos/{{ a.slug }}/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/{{ a.slug }}/{{ a.views[0] }}.jpg"
+             src="static/videos/{{ a.slug }}/{{ a.views[0] }}.mp4"></video>
+      <figcaption class="view-caption">reconstruction: {{ view_label[a.views[0]] }}</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    {% for v in a.views %}
+    <button class="button is-small view-btn{% if loop.first %} is-selected{% endif %}" type="button"
+            data-src="static/videos/{{ a.slug }}/{{ v }}.mp4" data-poster="static/videos/{{ a.slug }}/{{ v }}.jpg"
+            data-label="{{ view_label[v] }}">{{ view_label[v] }}</button>
+    {% endfor %}
+  </div>
+  {{ controls() }}
+</div>
+{% endmacro %}
+
+{% macro controls() %}
+<div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro meta(card) %}
+<p class="meta">
+  <strong>{{ card.acc.video }}</strong> · {{ card.road_users }} · {{ card.collision_label }}
+  · tier: {{ card.tier }} · predicted position error {{ card.uncertainty_m }} m · CARLA {{ card.town }}
+  {% if card.mirrored %}· left-hand traffic, simulated mirrored and flipped back{% endif %}
+</p>
+{% if card.vehicles %}
+<p class="meta legend">
+  {% for v in card.vehicles %}vehicle {{ v.n }} ({{ v.class }}, track {{ v.id }}){% if not loop.last %} · {% endif %}{% endfor %}
+  — the ego and LiDAR views are mounted on these
+</p>
+{% endif %}
+{% endmacro %}
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site.short_title }}: real accidents rebuilt in CARLA</title>
+  <meta name="description" content="{{ site.summary[0] }}">
+  <meta name="author" content="{% for a in site.authors %}{{ a.name }}{% if not loop.last %}, {% endif %}{% endfor %}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ site.title }}">
+  <meta property="og:description" content="{{ site.summary[0] }}">
+  <meta property="og:url" content="{{ site.url }}">
+  <meta property="og:image" content="{{ site.url }}static/images/social_preview.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="citation_title" content="{{ site.title }}">
+  {% for a in site.authors %}
+  <meta name="citation_author" content="{{ a.name }}">
+  {% endfor %}
+  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="static/css/site.css">
+  <script defer src="static/js/sync.js"></script>
+  <script defer src="static/js/gallery.js"></script>
+  <script defer src="static/js/plots.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-2 publication-title">{{ site.title }}</h1>
+      <div class="is-size-5 publication-authors">
+        {% for a in site.authors %}
+        <span class="author-block">{{ a.name }}{% if a.affiliations %}<sup>{{ a.affiliations|join(',') }}</sup>{% endif %}{% if not loop.last %},{% endif %}</span>
+        {% endfor %}
+      </div>
+      <div class="is-size-6 publication-affiliations">
+        {% for f in site.affiliations %}
+        <span class="author-block"><sup>{{ loop.index }}</sup>{{ f }}</span>
+        {% endfor %}
+      </div>
+      <div class="publication-links">
+        {% for l in site.links %}
+        {% if l.url %}
+        <a class="button is-dark is-rounded" href="{{ l.url }}"><span>{{ l.label }}</span></a>
+        {% else %}
+        <span class="button is-dark is-rounded is-static-link" title="{{ l.note }}"><span>{{ l.label }} <small>({{ l.note }})</small></span></span>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if teaser %}
+<section class="section teaser">
+  <div class="container is-max-desktop">
+    <video controls muted playsinline preload="none" poster="static/videos/teaser.jpg" src="static/videos/teaser.mp4"></video>
+    <p class="caption">Two accidents: the real CCTV clip, then the reconstruction from the near-real camera, a camera on one vehicle, and that vehicle's LiDAR.</p>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" id="summary">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">In three sentences</h2>
+    <div class="content summary">
+      {% for s in site.summary %}<p>{{ s }}</p>{% endfor %}
+    </div>
+    <figure class="pipeline">
+      <img src="static/images/pipeline.png" alt="The pipeline: perception (tracking and correction), geometry (camera pose from one frame, ground projection) and event reconstruction (scenario, scene, collision solver, render)" loading="lazy">
+      <figcaption>Perception extracts and repairs the trajectories; the geometry-first projection (GFP) maps them to metres from one frame, without clicks or a site map; the event stage rebuilds the accident in CARLA, checked by a gate and a person.</figcaption>
+    </figure>
+    <details class="abstract">
+      <summary>Full abstract</summary>
+      <p>{{ site.abstract }}</p>
+    </details>
+  </div>
+</section>
+
+<section class="section" id="gallery">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Gallery</h2>
+    <p class="intro">Nine accidents a reviewer rated good in the last iteration. The real clip plays on the left; choose the
+      reconstructed view on the right. Both clips run from 4 s before to 3 s after first contact (t = 0) and stay in step
+      while playing and scrubbing. <em>Ego</em> is a forward camera at the front of a crash vehicle's roof, <em>LiDAR</em> a 64-channel
+      scanner on its roof, drawn from behind and above and coloured by object class (yellow: vehicles, red: people,
+      purple: road).</p>
+    <div class="filters buttons" role="group" aria-label="Filter by collision type">
+      <button class="button is-small filter is-selected" type="button" data-filter="all">all</button>
+      {% for c in collisions %}
+      <button class="button is-small filter" type="button" data-filter="{{ c }}">{{ collision_label[c] }}</button>
+      {% endfor %}
+      <button class="button is-small filter" type="button" data-filter="two-wheeler">two-wheeler</button>
+    </div>
+    {% for card in gallery %}
+    <article class="card-acc" id="{{ card.acc.slug }}" data-collision="{{ card.acc.collision }}"
+             data-users="{{ card.road_users }}">
+      <h3 class="title is-5">{{ card.acc.title }}</h3>
+      {{ player(card, "gallery") }}
+      {{ meta(card) }}
+      <details class="plots" data-src="static/data/{{ card.acc.slug }}.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height ({{ card.tier }}).</p>
+      </details>
+      {% if card.zip_name %}
+      <p class="download"><a href="static/data/{{ card.zip_name }}" download>⤓
+        Download the scene ({{ card.zip_mb }} MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="history">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Six iterations of one accident ({{ history_video }})</h2>
+    <p class="intro">Each review iteration turned the reviewer's comments into scenario fields or pipeline fixes and
+      rendered every video again. Over the 76 videos, the reconstructions rated good rose from 37 to 66. Choose an
+      iteration to see this accident as it was rendered then, next to the real clip.</p>
+    <div class="player" data-window="{{ history_window[0] }},{{ history_window[1] }}" data-real="{{ history_span.real_from_s }},{{ history_span.real_to_s }}">
+      <div class="screens">
+        <figure class="screen">
+          <video class="master" muted playsinline preload="none" poster="static/videos/{{ history_slug }}/real.jpg"
+                 src="static/videos/{{ history_slug }}/real.mp4"></video>
+          <figcaption>real CCTV clip</figcaption>
+        </figure>
+        <figure class="screen">
+          {% set last = history|last %}
+          <video class="slave" muted playsinline preload="none" poster="static/videos/history/it{{ last.it }}.jpg"
+                 src="static/videos/history/it{{ last.it }}.mp4"></video>
+          <figcaption class="view-caption">iteration {{ last.it }}: {{ last.status }}</figcaption>
+        </figure>
+      </div>
+      <div class="views" role="group" aria-label="Iteration">
+        {% for h in history %}
+        <button class="button is-small view-btn status-{{ h.status_key }}{% if loop.last %} is-selected{% endif %}" type="button"
+                data-src="static/videos/history/it{{ h.it }}.mp4" data-poster="static/videos/history/it{{ h.it }}.jpg"
+                data-label="iteration {{ h.it }}: {{ h.status }}">v{{ h.it }} · {{ h.status }}</button>
+        {% endfor %}
+      </div>
+      {{ controls() }}
+    </div>
+    <p class="caption">Iteration 4 was rendered but rated for one video only, so it has no rating here.</p>
+  </div>
+</section>
+
+<section class="section" id="failures">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Where it fails</h2>
+    <p class="intro">Ten of the 76 reconstructions were still rated <em>needs work</em> after six iterations. Three of
+      them, with the reason.</p>
+    {% for card in failures %}
+    <article class="card-acc failure" id="{{ card.acc.slug }}">
+      <h3 class="title is-5">{{ card.acc.title }}</h3>
+      <p class="reason"><span aria-hidden="true">⚠</span> {{ card.acc.reason }}</p>
+      {{ player(card, "failure") }}
+      {{ meta(card) }}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="downloads">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Downloads</h2>
+    <p>Each gallery accident can be downloaded as a scene: the confirmed scenario, the trajectories GFP measured, every
+      road user the simulation drives, the collision solver's plan, and a CARLA 0.9.16 recorder log that replays the
+      run with any sensors you attach. A README in each archive describes every file and column.</p>
+    <table class="table is-fullwidth is-narrow">
+      <thead><tr><th>Accident</th><th>Road users</th><th>Collision</th><th>Map</th><th>Archive</th></tr></thead>
+      <tbody>
+      {% for card in gallery if card.zip_name %}
+      <tr><td><a href="#{{ card.acc.slug }}">{{ card.acc.video }}</a></td><td>{{ card.road_users }}</td>
+        <td>{{ card.collision_label }}</td><td>{{ card.town }}</td>
+        <td><a href="static/data/{{ card.zip_name }}" download>{{ card.zip_name }}</a> ({{ card.zip_mb }} MB)</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="prior">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Previous work</h2>
+    <ul class="prior">
+      {% for p in site.prior_work %}
+      <li><strong>{{ p.title }}</strong>, {{ p.venue }}, {{ p.year }}.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">BibTeX</h2>
+    <div class="bibtex-wrap">
+      <button class="button is-small copy-bibtex" type="button">Copy</button>
+      <pre><code id="bibtex-code">{{ site.bibtex }}</code></pre>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container is-max-desktop content has-text-centered">
+    <p>The real clips come from the CADP dataset and are shown unchanged for research. To have a clip removed, please
+      <a href="{{ site.takedown }}">open an issue</a>.</p>
+    <p>This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic
+      Project Page Template</a>, which was adopted from the <a href="https://nerfies.github.io">Nerfies</a> project page.
+      This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+      Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

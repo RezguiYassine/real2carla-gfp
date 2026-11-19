@@ -1,0 +1,16 @@
+[project]
+name = "real2carla-gfp-site"
+version = "1.0.0"
+description = "Companion website of the Real2CARLA-GFP paper: build tools"
+requires-python = ">=3.11"
+dependencies = [
+    "jinja2>=3.1",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "pydantic>=2.8",
+    "pyyaml>=6.0",
+]
+
+[tool.uv]
+exclude-newer = "1 week"
+package = false

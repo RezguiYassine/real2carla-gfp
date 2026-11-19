@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+
+
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Real2CARLA-GFP: real accidents rebuilt in CARLA</title>
+  <meta name="description" content="Real2CARLA-GFP turns an uncalibrated CCTV recording of a traffic accident into a CARLA simulation that can be replayed, filmed from any viewpoint and changed.">
+  <meta name="author" content="Yassine Rezgui, Andrea Schiederer, Mohamed Nebil Dellaji, Sahar Jemai, Daniel Laurin Eichhorn, Jonas Rullert, Bchira Ben Mabrouk, Abdelmajid Khelil">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Real2CARLA-GFP: Reconstructing Real Traffic Accidents in CARLA from Uncalibrated CCTV Video">
+  <meta property="og:description" content="Real2CARLA-GFP turns an uncalibrated CCTV recording of a traffic accident into a CARLA simulation that can be replayed, filmed from any viewpoint and changed.">
+  <meta property="og:url" content="https://rezguiyassine.github.io/real2carla-gfp/">
+  <meta property="og:image" content="https://rezguiyassine.github.io/real2carla-gfp/static/images/social_preview.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="citation_title" content="Real2CARLA-GFP: Reconstructing Real Traffic Accidents in CARLA from Uncalibrated CCTV Video">
+  <meta name="citation_author" content="Yassine Rezgui">
+  <meta name="citation_author" content="Andrea Schiederer">
+  <meta name="citation_author" content="Mohamed Nebil Dellaji">
+  <meta name="citation_author" content="Sahar Jemai">
+  <meta name="citation_author" content="Daniel Laurin Eichhorn">
+  <meta name="citation_author" content="Jonas Rullert">
+  <meta name="citation_author" content="Bchira Ben Mabrouk">
+  <meta name="citation_author" content="Abdelmajid Khelil">
+  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="static/css/site.css">
+  <script defer src="static/js/sync.js"></script>
+  <script defer src="static/js/gallery.js"></script>
+  <script defer src="static/js/plots.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-2 publication-title">Real2CARLA-GFP: Reconstructing Real Traffic Accidents in CARLA from Uncalibrated CCTV Video</h1>
+      <div class="is-size-5 publication-authors">
+        <span class="author-block">Yassine Rezgui<sup>1</sup>,</span>
+        <span class="author-block">Andrea Schiederer<sup>1</sup>,</span>
+        <span class="author-block">Mohamed Nebil Dellaji<sup>2</sup>,</span>
+        <span class="author-block">Sahar Jemai<sup>1</sup>,</span>
+        <span class="author-block">Daniel Laurin Eichhorn<sup>1</sup>,</span>
+        <span class="author-block">Jonas Rullert,</span>
+        <span class="author-block">Bchira Ben Mabrouk<sup>3</sup>,</span>
+        <span class="author-block">Abdelmajid Khelil<sup>1</sup></span>
+      </div>
+      <div class="is-size-6 publication-affiliations">
+        <span class="author-block"><sup>1</sup>Institute for Data and Process Science, Landshut University of Applied Sciences, Germany</span>
+        <span class="author-block"><sup>2</sup>TEK-UP University, Tunis, Tunisia</span>
+        <span class="author-block"><sup>3</sup>Higher Institute of Applied Sciences and Technology of Mateur, Tunisia</span>
+      </div>
+      <div class="publication-links">
+        <span class="button is-dark is-rounded is-static-link" title="under review"><span>Paper <small>(under review)</small></span></span>
+        <span class="button is-dark is-rounded is-static-link" title="released with the paper"><span>Code <small>(released with the paper)</small></span></span>
+        <a class="button is-dark is-rounded" href="#downloads"><span>Data</span></a>
+        <a class="button is-dark is-rounded" href="#bibtex"><span>BibTeX</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section teaser">
+  <div class="container is-max-desktop">
+    <video controls muted playsinline preload="none" poster="static/videos/teaser.jpg" src="static/videos/teaser.mp4"></video>
+    <p class="caption">Two accidents: the real CCTV clip, then the reconstruction from the near-real camera, a camera on one vehicle, and that vehicle's LiDAR.</p>
+  </div>
+</section>
+
+<section class="section" id="summary">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">In three sentences</h2>
+    <div class="content summary">
+<p>Real2CARLA-GFP turns an uncalibrated CCTV recording of a traffic accident into a CARLA simulation that can be replayed, filmed from any viewpoint and changed.</p><p>From a single frame it recovers the camera pose and maps every tracked road user to metres on the road, without clicked points or a site map: a median error of 3.26 m in simulation and 2.15 m on real roadside cameras.</p><p>A scenario that a person confirms then constrains the scene, the motion and a physics collision solver. Over six review iterations on 76 CADP videos, the reconstructions a reviewer rated good rose from 37 to 66.</p>    </div>
+    <figure class="pipeline">
+      <img src="static/images/pipeline.png" alt="The pipeline: perception (tracking and correction), geometry (camera pose from one frame, ground projection) and event reconstruction (scenario, scene, collision solver, render)" loading="lazy">
+      <figcaption>Perception extracts and repairs the trajectories; the geometry-first projection (GFP) maps them to metres from one frame, without clicks or a site map; the event stage rebuilds the accident in CARLA, checked by a gate and a person.</figcaption>
+    </figure>
+    <details class="abstract">
+      <summary>Full abstract</summary>
+      <p>Rebuilding a real traffic accident as an executable simulation requires identity-consistent trajectories, a metric ground mapping, and a collision that happens as it did. Real2CARLA-GFP is a trajectory-centric pipeline that turns uncalibrated CCTV recordings of accidents into CARLA scenarios, and this article measures each of its stages. Four multi-object trackers on real accident footage reach similar accuracy, and none keeps both colliding road users under one identity in most videos, which justifies interactive correction. Exact ground truth from 1,113 simulated scenes overturns two choices of our conference pipeline: a Jacobian correction raises the localization error of a clicked homography from 1.03 to 41.77 m, and support-vector regression estimates speed about four times more accurately than a statistical ensemble. Clicked correspondences are fragile and, on a stand-in simulator road, do not exist. A geometry-first projection therefore recovers the camera pose from one frame and derives the homography in closed form. Without clicks or a site map, it places vehicles within 40 m of the camera with a median error of 3.26 m in simulation, as accurately as four clicks on a metric map of the true site, and of 2.15 m on real roadside cameras. A scenario that a person confirms then constrains scene choice, motion, and a physics collision solver. Over six review iterations on 76 CADP videos, the reconstructions that a human reviewer rated good rose from 37 to 66, and an automatic scorecard agreed with the reviewer on 95.3 % of its judged verdicts.</p>
+    </details>
+  </div>
+</section>
+
+<section class="section" id="gallery">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Gallery</h2>
+    <p class="intro">Nine accidents a reviewer rated good in the last iteration. The real clip plays on the left; choose the
+      reconstructed view on the right. Both clips run from 4 s before to 3 s after first contact (t = 0) and stay in step
+      while playing and scrubbing. <em>Ego</em> is a forward camera at the front of a crash vehicle's roof, <em>LiDAR</em> a 64-channel
+      scanner on its roof, drawn from behind and above and coloured by object class (yellow: vehicles, red: people,
+      purple: road).</p>
+    <div class="filters buttons" role="group" aria-label="Filter by collision type">
+      <button class="button is-small filter is-selected" type="button" data-filter="all">all</button>
+      <button class="button is-small filter" type="button" data-filter="front_to_side">front to side</button>
+      <button class="button is-small filter" type="button" data-filter="front_to_rear">rear-end</button>
+      <button class="button is-small filter" type="button" data-filter="front_to_front">head-on</button>
+      <button class="button is-small filter" type="button" data-filter="side_to_side">sideswipe</button>
+      <button class="button is-small filter" type="button" data-filter="two-wheeler">two-wheeler</button>
+    </div>
+    <article class="card-acc" id="video-108" data-collision="front_to_side"
+             data-users="bus – car">
+      <h3 class="title is-5">A bus turns across a car&#39;s path</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-108/real.jpg"
+             src="static/videos/video-108/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-108/near_real.jpg"
+             src="static/videos/video-108/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-108/near_real.mp4" data-poster="static/videos/video-108/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-108/top_view.mp4" data-poster="static/videos/video-108/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-108/ego1.mp4" data-poster="static/videos/video-108/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-108/ego2.mp4" data-poster="static/videos/video-108/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-108/lidar1.mp4" data-poster="static/videos/video-108/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-108/lidar2.mp4" data-poster="static/videos/video-108/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 108</strong> · bus – car · front to side
+  · tier: metric (≤ 2 m) · predicted position error 1.9 m · CARLA Town03
+· left-hand traffic, simulated mirrored and flipped back</p>
+<p class="meta legend">
+vehicle 1 (bus, track 1621) · vehicle 2 (car, track 1670)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-108.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (metric (≤ 2 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-108.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-114" data-collision="front_to_side"
+             data-users="car – car">
+      <h3 class="title is-5">Two cars meet at a junction</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-114/real.jpg"
+             src="static/videos/video-114/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-114/near_real.jpg"
+             src="static/videos/video-114/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-114/near_real.mp4" data-poster="static/videos/video-114/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-114/top_view.mp4" data-poster="static/videos/video-114/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-114/ego1.mp4" data-poster="static/videos/video-114/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-114/ego2.mp4" data-poster="static/videos/video-114/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-114/lidar1.mp4" data-poster="static/videos/video-114/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-114/lidar2.mp4" data-poster="static/videos/video-114/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 114</strong> · car – car · front to side
+  · tier: lane (2–4 m) · predicted position error 2.7 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 4427) · vehicle 2 (car, track 4449)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-114.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (lane (2–4 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-114.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-127" data-collision="front_to_side"
+             data-users="car – motorcycle">
+      <h3 class="title is-5">A car turns into a motorcycle</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,0.4">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-127/real.jpg"
+             src="static/videos/video-127/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-127/near_real.jpg"
+             src="static/videos/video-127/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-127/near_real.mp4" data-poster="static/videos/video-127/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-127/top_view.mp4" data-poster="static/videos/video-127/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-127/ego1.mp4" data-poster="static/videos/video-127/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-127/ego2.mp4" data-poster="static/videos/video-127/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-127/lidar1.mp4" data-poster="static/videos/video-127/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-127/lidar2.mp4" data-poster="static/videos/video-127/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 127</strong> · car – motorcycle · front to side
+  · tier: lane (2–4 m) · predicted position error 3.1 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 4108) · vehicle 2 (motorcycle, track 4116)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-127.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (lane (2–4 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-127.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-30" data-collision="front_to_front"
+             data-users="car – car">
+      <h3 class="title is-5">Head-on collision of two cars</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-3.103,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-30/real.jpg"
+             src="static/videos/video-30/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-30/near_real.jpg"
+             src="static/videos/video-30/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-30/near_real.mp4" data-poster="static/videos/video-30/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-30/top_view.mp4" data-poster="static/videos/video-30/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-30/ego1.mp4" data-poster="static/videos/video-30/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-30/ego2.mp4" data-poster="static/videos/video-30/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-30/lidar1.mp4" data-poster="static/videos/video-30/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-30/lidar2.mp4" data-poster="static/videos/video-30/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 30</strong> · car – car · head-on
+  · tier: metric (≤ 2 m) · predicted position error 1.8 m · CARLA Town05
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 27919) · vehicle 2 (car, track 27949)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-30.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (metric (≤ 2 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-30.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-103" data-collision="front_to_front"
+             data-users="van – motorcycle">
+      <h3 class="title is-5">A van and a motorcycle collide head-on</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-3.1,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-103/real.jpg"
+             src="static/videos/video-103/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-103/near_real.jpg"
+             src="static/videos/video-103/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-103/near_real.mp4" data-poster="static/videos/video-103/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-103/top_view.mp4" data-poster="static/videos/video-103/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-103/ego1.mp4" data-poster="static/videos/video-103/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-103/ego2.mp4" data-poster="static/videos/video-103/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-103/lidar1.mp4" data-poster="static/videos/video-103/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-103/lidar2.mp4" data-poster="static/videos/video-103/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 103</strong> · van – motorcycle · head-on
+  · tier: metric (≤ 2 m) · predicted position error 1.6 m · CARLA Town04
+</p>
+<p class="meta legend">
+vehicle 1 (van, track 635) · vehicle 2 (motorcycle, track 661)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-103.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (metric (≤ 2 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-103.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-124" data-collision="side_to_side"
+             data-users="car – motorcycle">
+      <h3 class="title is-5">A car sideswipes a motorcycle</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-124/real.jpg"
+             src="static/videos/video-124/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-124/near_real.jpg"
+             src="static/videos/video-124/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-124/near_real.mp4" data-poster="static/videos/video-124/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-124/top_view.mp4" data-poster="static/videos/video-124/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-124/ego1.mp4" data-poster="static/videos/video-124/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-124/ego2.mp4" data-poster="static/videos/video-124/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-124/lidar1.mp4" data-poster="static/videos/video-124/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-124/lidar2.mp4" data-poster="static/videos/video-124/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 124</strong> · car – motorcycle · sideswipe
+  · tier: metric (≤ 2 m) · predicted position error 1.8 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 19369) · vehicle 2 (motorcycle, track 19412)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-124.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (metric (≤ 2 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-124.zip" download>⤓
+        Download the scene (0.6 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-58" data-collision="side_to_side"
+             data-users="car – truck">
+      <h3 class="title is-5">A truck sideswipes a car</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-58/real.jpg"
+             src="static/videos/video-58/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-58/near_real.jpg"
+             src="static/videos/video-58/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-58/near_real.mp4" data-poster="static/videos/video-58/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-58/top_view.mp4" data-poster="static/videos/video-58/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-58/ego1.mp4" data-poster="static/videos/video-58/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-58/ego2.mp4" data-poster="static/videos/video-58/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-58/lidar1.mp4" data-poster="static/videos/video-58/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-58/lidar2.mp4" data-poster="static/videos/video-58/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 58</strong> · car – truck · sideswipe
+  · tier: lane (2–4 m) · predicted position error 2.1 m · CARLA Town10HD
+· left-hand traffic, simulated mirrored and flipped back</p>
+<p class="meta legend">
+vehicle 1 (car, track 7985) · vehicle 2 (truck, track 8052)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-58.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (lane (2–4 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-58.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-160" data-collision="front_to_rear"
+             data-users="car – car">
+      <h3 class="title is-5">Rear-end collision in traffic</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-3.604,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-160/real.jpg"
+             src="static/videos/video-160/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-160/near_real.jpg"
+             src="static/videos/video-160/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-160/near_real.mp4" data-poster="static/videos/video-160/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-160/top_view.mp4" data-poster="static/videos/video-160/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-160/ego1.mp4" data-poster="static/videos/video-160/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-160/ego2.mp4" data-poster="static/videos/video-160/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-160/lidar1.mp4" data-poster="static/videos/video-160/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-160/lidar2.mp4" data-poster="static/videos/video-160/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 160</strong> · car – car · rear-end
+  · tier: metric (≤ 2 m) · predicted position error 1.8 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 21965) · vehicle 2 (car, track 22030)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-160.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (metric (≤ 2 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-160.zip" download>⤓
+        Download the scene (3.2 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+    <article class="card-acc" id="video-152" data-collision="front_to_rear"
+             data-users="car – car">
+      <h3 class="title is-5">Rear-end collision on a narrow street</h3>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-1.6,2.2">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-152/real.jpg"
+             src="static/videos/video-152/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-152/near_real.jpg"
+             src="static/videos/video-152/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-152/near_real.mp4" data-poster="static/videos/video-152/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-152/top_view.mp4" data-poster="static/videos/video-152/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-152/ego1.mp4" data-poster="static/videos/video-152/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-152/ego2.mp4" data-poster="static/videos/video-152/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-152/lidar1.mp4" data-poster="static/videos/video-152/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-152/lidar2.mp4" data-poster="static/videos/video-152/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 152</strong> · car – car · rear-end
+  · tier: lane (2–4 m) · predicted position error 2.2 m · CARLA Town02
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 24412) · vehicle 2 (car, track 24413)  — the ego and LiDAR views are mounted on these
+</p>
+
+      <details class="plots" data-src="static/data/video-152.json">
+        <summary>Paths and speeds</summary>
+        <div class="plot-row">
+          <div class="plot plot-top" aria-label="Top view of the paths"></div>
+          <div class="plot plot-speed" aria-label="Speed over time"></div>
+        </div>
+        <p class="caption">Line: the motion the simulation drives, including the history before each vehicle was
+          seen. Dots: positions and speeds GFP measured from the video. Absolute distances and speeds scale with the
+          estimated camera height (lane (2–4 m)).</p>
+      </details>
+      <p class="download"><a href="static/data/video-152.zip" download>⤓
+        Download the scene (0.1 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="history">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Six iterations of one accident (Video 160)</h2>
+    <p class="intro">Each review iteration turned the reviewer's comments into scenario fields or pipeline fixes and
+      rendered every video again. Over the 76 videos, the reconstructions rated good rose from 37 to 66. Choose an
+      iteration to see this accident as it was rendered then, next to the real clip.</p>
+    <div class="player" data-window="-4.0,3.0" data-real="-3.604,3.0">
+      <div class="screens">
+        <figure class="screen">
+          <video class="master" muted playsinline preload="none" poster="static/videos/video-160/real.jpg"
+                 src="static/videos/video-160/real.mp4"></video>
+          <figcaption>real CCTV clip</figcaption>
+        </figure>
+        <figure class="screen">
+          <video class="slave" muted playsinline preload="none" poster="static/videos/history/it6.jpg"
+                 src="static/videos/history/it6.mp4"></video>
+          <figcaption class="view-caption">iteration 6: good</figcaption>
+        </figure>
+      </div>
+      <div class="views" role="group" aria-label="Iteration">
+        <button class="button is-small view-btn status-needs_work" type="button"
+                data-src="static/videos/history/it1.mp4" data-poster="static/videos/history/it1.jpg"
+                data-label="iteration 1: needs work">v1 · needs work</button>
+        <button class="button is-small view-btn status-good" type="button"
+                data-src="static/videos/history/it2.mp4" data-poster="static/videos/history/it2.jpg"
+                data-label="iteration 2: good">v2 · good</button>
+        <button class="button is-small view-btn status-good" type="button"
+                data-src="static/videos/history/it3.mp4" data-poster="static/videos/history/it3.jpg"
+                data-label="iteration 3: good">v3 · good</button>
+        <button class="button is-small view-btn status-none" type="button"
+                data-src="static/videos/history/it4.mp4" data-poster="static/videos/history/it4.jpg"
+                data-label="iteration 4: not rated">v4 · not rated</button>
+        <button class="button is-small view-btn status-needs_work" type="button"
+                data-src="static/videos/history/it5.mp4" data-poster="static/videos/history/it5.jpg"
+                data-label="iteration 5: needs work">v5 · needs work</button>
+        <button class="button is-small view-btn status-good is-selected" type="button"
+                data-src="static/videos/history/it6.mp4" data-poster="static/videos/history/it6.jpg"
+                data-label="iteration 6: good">v6 · good</button>
+      </div>
+      <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+    </div>
+    <p class="caption">Iteration 4 was rendered but rated for one video only, so it has no rating here.</p>
+  </div>
+</section>
+
+<section class="section" id="failures">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-3">Where it fails</h2>
+    <p class="intro">Ten of the 76 reconstructions were still rated <em>needs work</em> after six iterations. Three of
+      them, with the reason.</p>
+    <article class="card-acc failure" id="video-144">
+      <h3 class="title is-5">A car, a pedestrian, and a car the tracker missed</h3>
+      <p class="reason"><span aria-hidden="true">⚠</span> The tracker missed the car that arrives from the left, strikes car 20837 and is pushed towards the pedestrian. Without it no car-to-car contact can be planned, so only the near miss with the pedestrian is rendered.</p>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-144/real.jpg"
+             src="static/videos/video-144/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-144/near_real.jpg"
+             src="static/videos/video-144/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-144/near_real.mp4" data-poster="static/videos/video-144/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-144/top_view.mp4" data-poster="static/videos/video-144/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-144/ego1.mp4" data-poster="static/videos/video-144/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-144/lidar1.mp4" data-poster="static/videos/video-144/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 144</strong> · car – person · other
+  · tier: lane (2–4 m) · predicted position error 3.6 m · CARLA Town04
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 20837)  — the ego and LiDAR views are mounted on these
+</p>
+
+    </article>
+    <article class="card-acc failure" id="video-41">
+      <h3 class="title is-5">Head-on collision seen from the wrong side</h3>
+      <p class="reason"><span aria-hidden="true">⚠</span> In the real video one car arrives from the front and the other from behind. The reconstruction places both arrivals one sector off in the same rotational direction, so they come from the right and the left, and the timing of the swerve does not match.</p>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-4.0,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-41/real.jpg"
+             src="static/videos/video-41/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-41/near_real.jpg"
+             src="static/videos/video-41/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-41/near_real.mp4" data-poster="static/videos/video-41/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-41/top_view.mp4" data-poster="static/videos/video-41/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-41/ego1.mp4" data-poster="static/videos/video-41/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-41/ego2.mp4" data-poster="static/videos/video-41/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-41/lidar1.mp4" data-poster="static/videos/video-41/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-41/lidar2.mp4" data-poster="static/videos/video-41/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 41</strong> · car – car · head-on
+  · tier: lane (2–4 m) · predicted position error 2.8 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 13751) · vehicle 2 (car, track 13798)  — the ego and LiDAR views are mounted on these
+</p>
+
+    </article>
+    <article class="card-acc failure" id="video-155">
+      <h3 class="title is-5">Junction collision with the roles reversed</h3>
+      <p class="reason"><span aria-hidden="true">⚠</span> At the annotated contact time, car 4062&#39;s track is still 10 m short of the other car&#39;s path. The collision solver reaches only a corner touch, with the striking and struck vehicles swapped.</p>
+      <div class="player" data-window="-4.0,3.0"
+     data-real="-2.549,3.0">
+  <div class="screens">
+    <figure class="screen">
+      <video class="master" muted playsinline preload="none" poster="static/videos/video-155/real.jpg"
+             src="static/videos/video-155/real.mp4"></video>
+      <figcaption>real CCTV clip</figcaption>
+    </figure>
+    <figure class="screen">
+      <video class="slave" muted playsinline preload="none" poster="static/videos/video-155/near_real.jpg"
+             src="static/videos/video-155/near_real.mp4"></video>
+      <figcaption class="view-caption">reconstruction: near-real</figcaption>
+    </figure>
+  </div>
+  <div class="views" role="group" aria-label="Reconstructed view">
+    <button class="button is-small view-btn is-selected" type="button"
+            data-src="static/videos/video-155/near_real.mp4" data-poster="static/videos/video-155/near_real.jpg"
+            data-label="near-real">near-real</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-155/top_view.mp4" data-poster="static/videos/video-155/top_view.jpg"
+            data-label="top view">top view</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-155/ego1.mp4" data-poster="static/videos/video-155/ego1.jpg"
+            data-label="ego 1">ego 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-155/ego2.mp4" data-poster="static/videos/video-155/ego2.jpg"
+            data-label="ego 2">ego 2</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-155/lidar1.mp4" data-poster="static/videos/video-155/lidar1.jpg"
+            data-label="LiDAR 1">LiDAR 1</button>
+    <button class="button is-small view-btn" type="button"
+            data-src="static/videos/video-155/lidar2.mp4" data-poster="static/videos/video-155/lidar2.jpg"
+            data-label="LiDAR 2">LiDAR 2</button>
+  </div>
+  <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+</div>
+
+      <p class="meta">
+  <strong>Video 155</strong> · car – car · front to side
+  · tier: lane (2–4 m) · predicted position error 2.3 m · CARLA Town05
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 4062) · vehicle 2 (car, track 4069)  — the ego and LiDAR views are mounted on these
+</p>
+
+    </article>
+  </div>
+</section>
+
+<section class="section" id="downloads">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Downloads</h2>
+    <p>Each gallery accident can be downloaded as a scene: the confirmed scenario, the trajectories GFP measured, every
+      road user the simulation drives, the collision solver's plan, and a CARLA 0.9.16 recorder log that replays the
+      run with any sensors you attach. A README in each archive describes every file and column.</p>
+    <table class="table is-fullwidth is-narrow">
+      <thead><tr><th>Accident</th><th>Road users</th><th>Collision</th><th>Map</th><th>Archive</th></tr></thead>
+      <tbody>
+      <tr><td><a href="#video-108">Video 108</a></td><td>bus – car</td>
+        <td>front to side</td><td>Town03</td>
+        <td><a href="static/data/video-108.zip" download>video-108.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-114">Video 114</a></td><td>car – car</td>
+        <td>front to side</td><td>Town03</td>
+        <td><a href="static/data/video-114.zip" download>video-114.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-127">Video 127</a></td><td>car – motorcycle</td>
+        <td>front to side</td><td>Town03</td>
+        <td><a href="static/data/video-127.zip" download>video-127.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-30">Video 30</a></td><td>car – car</td>
+        <td>head-on</td><td>Town05</td>
+        <td><a href="static/data/video-30.zip" download>video-30.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-103">Video 103</a></td><td>van – motorcycle</td>
+        <td>head-on</td><td>Town04</td>
+        <td><a href="static/data/video-103.zip" download>video-103.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-124">Video 124</a></td><td>car – motorcycle</td>
+        <td>sideswipe</td><td>Town03</td>
+        <td><a href="static/data/video-124.zip" download>video-124.zip</a> (0.6 MB)</td></tr>
+      <tr><td><a href="#video-58">Video 58</a></td><td>car – truck</td>
+        <td>sideswipe</td><td>Town10HD</td>
+        <td><a href="static/data/video-58.zip" download>video-58.zip</a> (0.1 MB)</td></tr>
+      <tr><td><a href="#video-160">Video 160</a></td><td>car – car</td>
+        <td>rear-end</td><td>Town03</td>
+        <td><a href="static/data/video-160.zip" download>video-160.zip</a> (3.2 MB)</td></tr>
+      <tr><td><a href="#video-152">Video 152</a></td><td>car – car</td>
+        <td>rear-end</td><td>Town02</td>
+        <td><a href="static/data/video-152.zip" download>video-152.zip</a> (0.1 MB)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="prior">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">Previous work</h2>
+    <ul class="prior">
+      <li><strong>Real2CARLA: Bridging Real and Synthetic Domains for Traffic Accident Simulation</strong>, IEEE ADACIS, 2025.</li>
+      <li><strong>Real2CARLA+: Geometry-Aware Traffic Accident Reconstruction in CARLA from Uncalibrated Real Accident Videos</strong>, under review, 2025.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="bibtex">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">BibTeX</h2>
+    <div class="bibtex-wrap">
+      <button class="button is-small copy-bibtex" type="button">Copy</button>
+      <pre><code id="bibtex-code">@misc{rezgui2026real2carlagfp,
+  author = {Yassine Rezgui and Andrea Schiederer and Mohamed Nebil Dellaji and
+            Sahar Jemai and Daniel Laurin Eichhorn and Jonas Rullert and
+            Bchira Ben Mabrouk and Abdelmajid Khelil},
+  title  = {{Real2CARLA-GFP}: Reconstructing Real Traffic Accidents in {CARLA}
+            from Uncalibrated {CCTV} Video},
+  year   = {2026},
+  note   = {Under review}
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container is-max-desktop content has-text-centered">
+    <p>The real clips come from the CADP dataset and are shown unchanged for research. To have a clip removed, please
+      <a href="https://github.com/RezguiYassine/real2carla-gfp/issues">open an issue</a>.</p>
+    <p>This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic
+      Project Page Template</a>, which was adopted from the <a href="https://nerfies.github.io">Nerfies</a> project page.
+      This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+      Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+  </div>
+</footer>
+</body>
+</html>

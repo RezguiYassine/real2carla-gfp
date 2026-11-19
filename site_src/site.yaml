@@ -1,0 +1,83 @@
+title: "Real2CARLA-GFP: Reconstructing Real Traffic Accidents in CARLA from Uncalibrated CCTV Video"
+short_title: Real2CARLA-GFP
+url: https://rezguiyassine.github.io/real2carla-gfp/
+
+authors:
+  - {name: Yassine Rezgui, affiliations: [1]}
+  - {name: Andrea Schiederer, affiliations: [1]}
+  - {name: Mohamed Nebil Dellaji, affiliations: [2]}
+  - {name: Sahar Jemai, affiliations: [1]}
+  - {name: Daniel Laurin Eichhorn, affiliations: [1]}
+  - {name: Jonas Rullert}
+  - {name: Bchira Ben Mabrouk, affiliations: [3]}
+  - {name: Abdelmajid Khelil, affiliations: [1]}
+
+affiliations:
+  - Institute for Data and Process Science, Landshut University of Applied Sciences, Germany
+  - TEK-UP University, Tunis, Tunisia
+  - Higher Institute of Applied Sciences and Technology of Mateur, Tunisia
+
+summary:
+  - >-
+    Real2CARLA-GFP turns an uncalibrated CCTV recording of a traffic accident
+    into a CARLA simulation that can be replayed, filmed from any viewpoint and
+    changed.
+  - >-
+    From a single frame it recovers the camera pose and maps every tracked road
+    user to metres on the road, without clicked points or a site map: a median
+    error of 3.26 m in simulation and 2.15 m on real roadside cameras.
+  - >-
+    A scenario that a person confirms then constrains the scene, the motion and
+    a physics collision solver. Over six review iterations on 76 CADP videos,
+    the reconstructions a reviewer rated good rose from 37 to 66.
+
+abstract: >-
+  Rebuilding a real traffic accident as an executable simulation requires
+  identity-consistent trajectories, a metric ground mapping, and a collision
+  that happens as it did. Real2CARLA-GFP is a trajectory-centric pipeline that
+  turns uncalibrated CCTV recordings of accidents into CARLA scenarios, and
+  this article measures each of its stages. Four multi-object trackers on real
+  accident footage reach similar accuracy, and none keeps both colliding road
+  users under one identity in most videos, which justifies interactive
+  correction. Exact ground truth from 1,113 simulated scenes overturns two
+  choices of our conference pipeline: a Jacobian correction raises the
+  localization error of a clicked homography from 1.03 to 41.77 m, and
+  support-vector regression estimates speed about four times more accurately
+  than a statistical ensemble. Clicked correspondences are fragile and, on a
+  stand-in simulator road, do not exist. A geometry-first projection therefore
+  recovers the camera pose from one frame and derives the homography in closed
+  form. Without clicks or a site map, it places vehicles within 40 m of the
+  camera with a median error of 3.26 m in simulation, as accurately as four
+  clicks on a metric map of the true site, and of 2.15 m on real roadside
+  cameras. A scenario that a person confirms then constrains scene choice,
+  motion, and a physics collision solver. Over six review iterations on 76
+  CADP videos, the reconstructions that a human reviewer rated good rose from
+  37 to 66, and an automatic scorecard agreed with the reviewer on 95.3 % of
+  its judged verdicts.
+
+links:
+  - {label: Paper, note: under review}
+  - {label: Code, note: released with the paper}
+  - {label: Data, url: "#downloads"}
+  - {label: BibTeX, url: "#bibtex"}
+
+bibtex: |-
+  @misc{rezgui2026real2carlagfp,
+    author = {Yassine Rezgui and Andrea Schiederer and Mohamed Nebil Dellaji and
+              Sahar Jemai and Daniel Laurin Eichhorn and Jonas Rullert and
+              Bchira Ben Mabrouk and Abdelmajid Khelil},
+    title  = {{Real2CARLA-GFP}: Reconstructing Real Traffic Accidents in {CARLA}
+              from Uncalibrated {CCTV} Video},
+    year   = {2026},
+    note   = {Under review}
+  }
+
+prior_work:
+  - title: "Real2CARLA: Bridging Real and Synthetic Domains for Traffic Accident Simulation"
+    venue: IEEE ADACIS
+    year: 2025
+  - title: "Real2CARLA+: Geometry-Aware Traffic Accident Reconstruction in CARLA from Uncalibrated Real Accident Videos"
+    venue: under review
+    year: 2025
+
+takedown: https://github.com/RezguiYassine/real2carla-gfp/issues

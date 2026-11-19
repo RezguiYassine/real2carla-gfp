@@ -1,0 +1,83 @@
+/* Site styles on top of Bulma. */
+:root {
+  --ink: #1d232a;
+  --muted: #5b6672;
+  --line: #e3e6ea;
+  --accent: #2a78d6;      /* perception blue in the paper's figures */
+  --geo: #eb6834;         /* geometry orange */
+  --evt: #1baf7a;         /* event green */
+  --bad: #c0392b;
+  --bg: #ffffff;
+  --panel: #f6f7f9;
+}
+
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; overflow-x: hidden; }
+.title { color: var(--ink); }
+.section { padding: 2.5rem 1rem; }
+.hero-body { padding: 3rem 1rem 1.5rem; }
+
+.publication-title { line-height: 1.25; margin-bottom: 1rem !important; }
+.publication-authors .author-block { display: inline-block; margin: 0 0.15rem; }
+.publication-affiliations { color: var(--muted); margin-top: 0.4rem; }
+.publication-affiliations .author-block { display: inline-block; margin: 0 0.5rem; }
+.publication-links { margin-top: 1.2rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.is-static-link { opacity: 0.55; cursor: default; }
+.is-static-link small { font-weight: 400; margin-left: 0.25rem; }
+
+.teaser video { width: 100%; border-radius: 6px; background: #000; display: block; }
+.caption { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+.intro { max-width: 60rem; margin-bottom: 1rem; }
+.summary p { font-size: 1.08rem; }
+.pipeline { margin: 1.5rem 0 1rem; }
+.pipeline img { width: 100%; height: auto; display: block; }
+.pipeline figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }
+details.abstract summary, details.plots summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details.abstract p { margin-top: 0.6rem; text-align: justify; }
+
+.filters { margin-bottom: 0.5rem; }
+.button.is-selected { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.card-acc { border-top: 1px solid var(--line); padding: 1.5rem 0 1rem; }
+.card-acc .title { margin-bottom: 0.6rem; }
+.card-acc[hidden] { display: none; }
+.failure .reason { background: #fdf0ef; border-left: 3px solid var(--bad); padding: 0.6rem 0.8rem; margin-bottom: 0.8rem; }
+
+.player { background: var(--panel); border-radius: 8px; padding: 0.6rem; }
+.screens { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.screen { margin: 0; }
+.screen video { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #000; border-radius: 4px; display: block; }
+.screen figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 0.2rem; }
+.views { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
+.controls { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.controls .play { min-width: 2.6rem; }
+.scrub-wrap { position: relative; flex: 1 1 12rem; display: flex; align-items: center; }
+.scrub { width: 100%; accent-color: var(--accent); }
+.contact-mark { position: absolute; top: -0.35rem; width: 2px; height: 1.6rem; background: var(--bad); pointer-events: none; }
+.tlabel { font-variant-numeric: tabular-nums; min-width: 6.5rem; font-size: 0.9rem; }
+.rates { display: flex; gap: 0.2rem; }
+.status-good::before { content: "●"; color: var(--evt); margin-right: 0.25rem; }
+.status-needs_work::before { content: "●"; color: var(--bad); margin-right: 0.25rem; }
+.status-none::before { content: "○"; color: var(--muted); margin-right: 0.25rem; }
+
+.meta { font-size: 0.9rem; color: var(--muted); margin-top: 0.5rem; }
+.legend { margin-top: 0.1rem; }
+details.plots { margin-top: 0.6rem; }
+.plot-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem; }
+.plot { min-height: 360px; }
+.download { margin-top: 0.6rem; }
+
+.bibtex-wrap { position: relative; }
+.bibtex-wrap pre { background: var(--panel); padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
+.copy-bibtex { position: absolute; top: 0.5rem; right: 0.5rem; }
+.prior li { margin-bottom: 0.4rem; }
+.table { font-size: 0.92rem; }
+.footer { background: var(--panel); padding: 2rem 1rem; font-size: 0.85rem; color: var(--muted); }
+
+@media (max-width: 768px) {
+  .screens, .plot-row { grid-template-columns: 1fr; }
+  .publication-title { font-size: 1.6rem !important; }
+  #downloads .table th:nth-child(3), #downloads .table td:nth-child(3),
+  #downloads .table th:nth-child(4), #downloads .table td:nth-child(4) { display: none; }
+  .tlabel { min-width: auto; }
+}
