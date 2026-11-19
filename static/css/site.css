@@ -7,6 +7,8 @@
   --geo: #eb6834;         /* geometry orange */
   --evt: #1baf7a;         /* event green */
   --bad: #c0392b;
+  --v1: #29b6f6;          /* vehicle 1 and 2 in the top-view overlay */
+  --v2: #ff5733;
   --bg: #ffffff;
   --panel: #f6f7f9;
 }
@@ -25,7 +27,14 @@ body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; o
 .is-static-link { opacity: 0.55; cursor: default; }
 .is-static-link small { font-weight: 400; margin-left: 0.25rem; }
 
-.teaser video { width: 100%; border-radius: 6px; background: #000; display: block; }
+.showcase { padding-top: 1rem; }
+.grid-player .real-top { width: calc(50% - 0.3rem); margin: 0 auto 0.6rem; }
+.grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem; }
+.screen.r43 video { aspect-ratio: 4 / 3; }
+.screen.r169 video { aspect-ratio: 16 / 9; }
+.dot { display: inline-block; width: 0.65rem; height: 0.65rem; border-radius: 50%; margin-right: 0.3rem; }
+.dot-1 { background: var(--v1); }
+.dot-2 { background: var(--v2); }
 .caption { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
 .intro { max-width: 60rem; margin-bottom: 1rem; }
 .summary p { font-size: 1.08rem; }
@@ -80,4 +89,7 @@ details.plots { margin-top: 0.6rem; }
   #downloads .table th:nth-child(3), #downloads .table td:nth-child(3),
   #downloads .table th:nth-child(4), #downloads .table td:nth-child(4) { display: none; }
   .tlabel { min-width: auto; }
+  .grid-player .real-top { width: 100%; }
+  .grid-row { gap: 0.35rem; }
+  .grid-row .screen figcaption { font-size: 0.75rem; }
 }

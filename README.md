@@ -21,12 +21,12 @@ site_src/
   real_spans.json           written by encode_clips.py: where each real clip has footage
 static/
   css/ js/ images/
-  videos/<video-N>/         real + six views, poster per clip; history/; teaser.mp4
+  videos/<video-N>/         real + six views, poster per clip; history/
   data/<video-N>.json|zip   plot data and scene downloads
 tools/
   render_extra_views.py     CARLA: ego camera + semantic LiDAR on each crash vehicle
   encode_clips.py           cut every clip to the window around contact, H.264
-  make_teaser.py            the teaser
+  overlay_top_view.py       boxes, paths, speeds, gap and time to collision on the top view
   build_site.py             manifest -> index.html, plot data, zips
   manifest.py               typed manifest (pydantic)
 ```
@@ -47,16 +47,18 @@ clips from the CADP folders on the secondary disk.
    python3.11 carla_safe.py --quiet
    ```
 
-2. Encode, compose the teaser and build:
+2. Draw the overlay on the top view of every accident marked `overlay: true`
+   (the hero, Video 201), then encode and build:
 
    ```bash
+   uv run tools/overlay_top_view.py "_work/render/Video 201" --aspect 4:3
    uv run tools/encode_clips.py
-   uv run tools/make_teaser.py
    uv run tools/build_site.py
    python3 -m http.server 8000    # preview at http://localhost:8000
    ```
 
-Adding an accident means one entry in `site_src/accidents.yaml`; the build
+The hero at the top of the page (`hero:` in the manifest) shows all six views at
+once and starts playing when it is on screen. Adding an accident means one entry in `site_src/accidents.yaml`; the build
 checks it against the scenario's collision type, the reviewer's rating and the
 clip frame counts.
 

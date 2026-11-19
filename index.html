@@ -63,10 +63,86 @@
   </div>
 </section>
 
-<section class="section teaser">
-  <div class="container is-max-desktop">
-    <video controls muted playsinline preload="none" poster="static/videos/teaser.jpg" src="static/videos/teaser.mp4"></video>
-    <p class="caption">Two accidents: the real CCTV clip, then the reconstruction from the near-real camera, a camera on one vehicle, and that vehicle's LiDAR.</p>
+<section class="section showcase" id="video-201">
+  <div class="container is-max-widescreen">
+    <h2 class="title is-4">Video 201: a car turning left is struck by a car going straight</h2>
+    <div class="player grid-player" data-autoplay data-window="-4.0,3.0">
+      <figure class="screen r43 real-top">
+        <video class="master" muted playsinline preload="auto" poster="static/videos/video-201/real.jpg"
+               src="static/videos/video-201/real.mp4"></video>
+        <figcaption>real CCTV clip</figcaption>
+      </figure>
+      <div class="grid-row">
+        <figure class="screen r43">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/near_real.jpg"
+         src="static/videos/video-201/near_real.mp4"></video>
+  <figcaption>near-real camera: the CARLA scene from the real camera&#39;s pose</figcaption>
+</figure>
+
+        <figure class="screen r43">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/top_view.jpg"
+         src="static/videos/video-201/top_view.mp4"></video>
+  <figcaption>top view: paths, speeds, gap and time to collision</figcaption>
+</figure>
+
+      </div>
+      <div class="grid-row">
+        <figure class="screen r169">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/ego1.jpg"
+         src="static/videos/video-201/ego1.mp4"></video>
+  <figcaption><span class="dot dot-1"></span>ego camera on vehicle 1 (car 3435)</figcaption>
+</figure>
+
+        <figure class="screen r169">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/ego2.jpg"
+         src="static/videos/video-201/ego2.mp4"></video>
+  <figcaption><span class="dot dot-2"></span>ego camera on vehicle 2 (car 3457)</figcaption>
+</figure>
+
+      </div>
+      <div class="grid-row">
+        <figure class="screen r169">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/lidar1.jpg"
+         src="static/videos/video-201/lidar1.mp4"></video>
+  <figcaption><span class="dot dot-1"></span>LiDAR on vehicle 1</figcaption>
+</figure>
+
+        <figure class="screen r169">
+  <video class="slave" muted playsinline preload="auto" poster="static/videos/video-201/lidar2.jpg"
+         src="static/videos/video-201/lidar2.mp4"></video>
+  <figcaption><span class="dot dot-2"></span>LiDAR on vehicle 2</figcaption>
+</figure>
+
+      </div>
+      <div class="controls">
+  <button class="button is-small play" type="button" aria-label="Play">▶</button>
+  <div class="scrub-wrap">
+    <input class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Time">
+    <span class="contact-mark" title="first contact, t = 0"></span>
+  </div>
+  <span class="tlabel">t = −4.0 s</span>
+  <div class="rates" role="group" aria-label="Speed">
+    <button class="button is-small rate" type="button" data-rate="0.25">0.25×</button>
+    <button class="button is-small rate" type="button" data-rate="0.5">0.5×</button>
+    <button class="button is-small rate is-selected" type="button" data-rate="1">1×</button>
+  </div>
+</div>
+
+    </div>
+    <p class="caption">All seven clips run from 4 s before to 3 s after first contact (t = 0) and play in step. In the
+      top view each vehicle carries its box, its whole path (faint) and the part already driven (solid); the panel
+      gives the gap between the two bodies and the time to collision at the current closing speed. Speeds and gaps
+      are those of the simulation, whose absolute scale follows the estimated camera height.</p>
+    <p class="meta">
+  <strong>Video 201</strong> · car – car · front to side
+  · tier: lane (2–4 m) · predicted position error 2.4 m · CARLA Town03
+</p>
+<p class="meta legend">
+vehicle 1 (car, track 3435) · vehicle 2 (car, track 3457)  — the ego and LiDAR views are mounted on these
+</p>
+
+    <p class="download"><a href="static/data/video-201.zip" download>⤓
+      Download the scene (0.7 MB): scenario, trajectories, solver plan, CARLA recorder log</a></p>
   </div>
 </section>
 
@@ -1026,6 +1102,9 @@ vehicle 1 (car, track 4062) · vehicle 2 (car, track 4069)  — the ego and LiDA
     <table class="table is-fullwidth is-narrow">
       <thead><tr><th>Accident</th><th>Road users</th><th>Collision</th><th>Map</th><th>Archive</th></tr></thead>
       <tbody>
+      <tr><td><a href="#video-201">Video 201</a></td><td>car – car</td>
+        <td>front to side</td><td>Town03</td>
+        <td><a href="static/data/video-201.zip" download>video-201.zip</a> (0.7 MB)</td></tr>
       <tr><td><a href="#video-108">Video 108</a></td><td>bus – car</td>
         <td>front to side</td><td>Town03</td>
         <td><a href="static/data/video-108.zip" download>video-108.zip</a> (0.1 MB)</td></tr>

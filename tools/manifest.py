@@ -33,6 +33,9 @@ class Accident(_Frozen):
     window_s: tuple[float, float] = (-4.0, 3.0)
     download: bool = False
     reason: str | None = None
+    # top view with the crash pair's boxes, paths, speeds, gap and time to
+    # collision drawn on it (tools/overlay_top_view.py)
+    overlay: bool = False
 
     @property
     def slug(self) -> str:
@@ -46,13 +49,14 @@ class History(_Frozen):
 
 
 class Manifest(_Frozen):
+    hero: Accident                  # shown first, all views at once, playing on arrival
     gallery: tuple[Accident, ...]
     failures: tuple[Accident, ...]
     history: History
 
     @property
     def accidents(self) -> tuple[Accident, ...]:
-        return self.gallery + self.failures
+        return (self.hero,) + self.gallery + self.failures
 
 
 class Author(_Frozen):

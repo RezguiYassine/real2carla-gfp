@@ -23,6 +23,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
+import pandas as pd
+
 from manifest import Accident, load_manifest
 
 FPS = 30
@@ -30,6 +32,7 @@ MAX_W = 960                  # the page shows each clip at about half its width
 CRF = {"lidar": 30}          # LiDAR sweeps are dense dots; a higher CRF keeps them under 3 MB
 DEFAULT_CRF = 28
 REAL_DIRS = (Path("/media/safe/secondary disk/Jonas/Input2"), Path("/media/safe/secondary disk/Jonas/Input"))
+FPS_TABLE = Path("results/gfp_v2/video_fps.csv")      # in Sim2sim: measured frame rate and original file
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -102,12 +105,17 @@ def run(job: Job) -> Path:
     return job.dst
 
 
-def real_source(video: str) -> Path:
+def real_source(video: str, sim2sim: Path) -> Path:
+    """The original clip. A sub-clip (Video 201) plays from its parent file, as
+    in Sim2sim's review tool; the frame-rate table names the parent."""
     for d in REAL_DIRS:
         f = d / f"{video}.mp4"
         if f.exists():
             return f
-    raise FileNotFoundError(f"{video}: no original clip in {', '.join(map(str, REAL_DIRS))}")
+    table = pd.read_csv(sim2sim / FPS_TABLE).fillna("").set_index("video")
+    if video in table.index and table.at[video, "original"] and Path(table.at[video, "original"]).exists():
+        return Path(table.at[video, "original"])
+    raise FileNotFoundError(f"{video}: no original clip in {', '.join(map(str, REAL_DIRS))} or {FPS_TABLE}")
 
 
 def accident_jobs(acc: Accident, sim2sim: Path, render: Path, out: Path) -> tuple[list[Job], dict]:
@@ -119,10 +127,15 @@ def accident_jobs(acc: Accident, sim2sim: Path, render: Path, out: Path) -> tupl
     if extra_meta["collision_at_frame"] != reviewed["collision_at_frame"]:
         raise ValueError(f"{acc.video}: extra views and the reviewed render disagree on the contact frame")
     dst = out / acc.slug
-    real, span = real_job(real_source(acc.video), float(rec["collision"]["frame"]), acc.window_s, dst / "real.mp4")
+    real, span = real_job(real_source(acc.video, sim2sim), float(rec["collision"]["frame"]), acc.window_s,
+                          dst / "real.mp4")
     jobs = [real]
     for view in acc.views:
         src = (res / "sim_videos" / acc.video if view in ("near_real", "top_view") else extra) / f"{view}.mp4"
+        if view == "top_view" and acc.overlay:
+            src = extra / "top_view_overlay.mp4"
+            if not src.exists():
+                raise FileNotFoundError(f"{src} missing; run tools/overlay_top_view.py \"{extra}\" --aspect 4:3")
         jobs.append(sim_job(src, int(reviewed["collision_at_frame"]), acc.window_s, dst / f"{view}.mp4",
                             "lidar" if view.startswith("lidar") else view))
     return jobs, span

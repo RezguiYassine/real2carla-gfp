@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import time
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -170,8 +171,11 @@ def build_zip(acc: Accident, res: Path, render_dir: Path, out: Path, status: str
         folder = acc.slug
         for name, f in files.items():
             zf.write(f, f"{folder}/{name}")
-        zf.writestr(f"{folder}/README.md", ZIP_README.format(video=acc.video, status=status, town=town,
-                                                             mirror=mirror))
+        # dated like its newest input, so an unchanged scene rebuilds byte for byte
+        newest = time.localtime(max(f.stat().st_mtime for f in files.values()))[:6]
+        zf.writestr(zipfile.ZipInfo(f"{folder}/README.md", date_time=newest),
+                    ZIP_README.format(video=acc.video, status=status, town=town, mirror=mirror),
+                    compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
     return z
 
 
@@ -228,6 +232,7 @@ def main() -> None:
     data.mkdir(parents=True, exist_ok=True)
     for acc in man.accidents:
         check_clips(acc, videos)
+    hero = make_card(man.hero, res, args.render, data, spans, feedback, current)
     gallery = [make_card(a, res, args.render, data, spans, feedback, current) for a in man.gallery]
     failures = [make_card(a, res, args.render, data, spans, feedback, current) for a in man.failures]
     hist_dir = videos / "history"
@@ -238,11 +243,11 @@ def main() -> None:
     env = Environment(loader=FileSystemLoader(ROOT / "site_src"), autoescape=True,
                       undefined=StrictUndefined, trim_blocks=True, lstrip_blocks=True)
     html = env.get_template("index.html.j2").render(
-        site=site, gallery=gallery, failures=failures, history=history_cards(man, feedback),
+        site=site, hero=hero, gallery=gallery, failures=failures, history=history_cards(man, feedback),
         history_video=man.history.video, history_slug=history_slug, history_window=man.history.window_s,
         history_span=spans[man.history.video], view_label=VIEW_LABEL,
         collisions=sorted({c.acc.collision for c in gallery}, key=list(COLLISION_LABEL).index),
-        collision_label=COLLISION_LABEL, teaser=(videos / "teaser.mp4").exists())
+        collision_label=COLLISION_LABEL)
     (ROOT / "index.html").write_text(html)
     total = sum(f.stat().st_size for f in (ROOT / "static").rglob("*") if f.is_file())
     print(f"index.html: {len(gallery)} gallery, {len(failures)} failures; static/ {total / 1e6:.0f} MB")

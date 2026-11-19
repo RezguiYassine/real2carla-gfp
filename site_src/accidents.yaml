@@ -3,7 +3,16 @@
 #
 # collision: the scenario's collision.type (checked at build time)
 # window_s:  clip around first contact, t = 0
-# role:      gallery (rated good in iteration 6) or failure (still needs work)
+# role:      hero (top of the page, all views at once), gallery (rated good in
+#            iteration 6) or failure (still needs work)
+# overlay:   top view with boxes, paths, speeds, gap and time to collision
+
+hero:
+  video: Video 201
+  title: A car turning left is struck by a car going straight
+  collision: front_to_side
+  download: true
+  overlay: true
 
 gallery:
   - video: Video 108
