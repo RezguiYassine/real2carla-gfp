@@ -71,11 +71,16 @@ def real_job(src: Path, contact_frame: float, window: tuple[float, float], dst: 
     start, end = tc + window[0], tc + window[1]
     a, b = max(0.0, start), min(p["duration"], end)
     pad_before, pad_after = a - start, end - b
-    hold = f"between(t,0,{pad_before:.3f})+gte(t,{pad_before + (b - a):.3f})"
-    vf = (f"fps={FPS},{scale(p['width'])},"
-          f"tpad=start_duration={pad_before:.3f}:stop_duration={pad_after + 1:.3f}:start_mode=clone:stop_mode=clone,"
-          f"drawtext=fontfile={FONT}:text='no real footage':fontcolor=white:fontsize=h/14:"
-          f"box=1:boxcolor=black@0.6:boxborderw=8:x=(w-tw)/2:y=h-th-h/12:enable='{hold}'")
+    label = (f"drawtext=fontfile={FONT}:text='{{text}}':fontcolor=white:fontsize=h/14:"
+             f"box=1:boxcolor=black@0.6:boxborderw=8:x=(w-tw)/2:y=h-th-h/12:enable='{{when}}'")
+    held = []                    # the held first / last frame says which side of the recording it is
+    if pad_before > 0:
+        held.append(label.format(text="before the recording", when=f"lt(t,{pad_before:.3f})"))
+    if pad_after > 0:
+        held.append(label.format(text="after the recording", when=f"gte(t,{pad_before + (b - a):.3f})"))
+    vf = ",".join([f"fps={FPS}", scale(p["width"]),
+                   f"tpad=start_duration={pad_before:.3f}:stop_duration={pad_after + 1:.3f}"
+                   ":start_mode=clone:stop_mode=clone", *held])
     span = {"source_fps": round(p["fps"], 3), "contact_s_in_source": round(tc, 3),
             "real_from_s": round(a - tc, 3), "real_to_s": round(b - tc, 3)}
     return Job(src, dst, vf, (a, b - a), n_frames(window), DEFAULT_CRF), span
