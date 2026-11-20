@@ -4,13 +4,13 @@ url: https://rezguiyassine.github.io/real2carla-gfp/
 
 authors:
   - {name: Yassine Rezgui, affiliations: [1]}
+  - {name: Abdelmajid Khelil, affiliations: [1]}
   - {name: Andrea Schiederer, affiliations: [1]}
   - {name: Mohamed Nebil Dellaji, affiliations: [2]}
   - {name: Sahar Jemai, affiliations: [1]}
   - {name: Daniel Laurin Eichhorn, affiliations: [1]}
   - {name: Jonas Rullert}
   - {name: Bchira Ben Mabrouk, affiliations: [3]}
-  - {name: Abdelmajid Khelil, affiliations: [1]}
 
 affiliations:
   - Institute for Data and Process Science, Landshut University of Applied Sciences, Germany
@@ -63,9 +63,9 @@ links:
 
 bibtex: |-
   @misc{rezgui2026real2carlagfp,
-    author = {Yassine Rezgui and Andrea Schiederer and Mohamed Nebil Dellaji and
-              Sahar Jemai and Daniel Laurin Eichhorn and Jonas Rullert and
-              Bchira Ben Mabrouk and Abdelmajid Khelil},
+    author = {Yassine Rezgui and Abdelmajid Khelil and Andrea Schiederer and
+              Mohamed Nebil Dellaji and Sahar Jemai and Daniel Laurin Eichhorn and
+              Jonas Rullert and Bchira Ben Mabrouk},
     title  = {{Real2CARLA-GFP}: Reconstructing Real Traffic Accidents in {CARLA}
               from Uncalibrated {CCTV} Video},
     year   = {2026},
